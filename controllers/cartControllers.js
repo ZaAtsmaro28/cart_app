@@ -56,3 +56,17 @@ exports.updateQty = (req, res) => {
 
   res.json({ message: "Cart updated", cart: carts[userId] });
 }
+
+exports.deleteItem = (req, res) => {
+  const userId = req.params.userId
+  const productId = req.params.productId
+
+  const cart = carts[userId]
+  if (!cart) {
+    return res.status(404).json({message: "Cart not found"})
+  }
+
+  carts[userId] = cart.filter((item) => item.productId !== productId);
+
+  res.json({message: `deleted item ${productId} from ${carts[userId]}`})
+}
