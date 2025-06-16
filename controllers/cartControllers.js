@@ -25,5 +25,34 @@ exports.addToCart = (req, res) => {
 
 exports.getCart = (req, res) => {
   const userId = req.params.userId
-  const cart = carts[userId] 
+  const cart = carts[userId] || []
+  
+  res.json({cart})
+}
+
+exports.updateQty = (req, res) => {
+  const userId = req.params.userId
+  const {productId, qty} = req.body
+
+  if (!productId || typeof qty !== Number) {
+    return res.status(400).json({message: "Incomplete field data or type missmatch"})
+  }
+
+  const cart = carts[userId]
+  if (!cart) {
+    return res.status(404).json({message: "Cart not found"})
+  }
+
+  const item = cart.find(item => item.productId === productId)
+  if (!item) {
+    return res.status(404).json({message: "Product not found"})
+  }
+
+  if (qty <= 0) {
+    carts[userId] = cart.filter(item => item.productId !== productId)
+  } else {
+    item.qty = qty;
+  }
+
+  res.json({ message: "Cart updated", cart: carts[userId] });
 }
